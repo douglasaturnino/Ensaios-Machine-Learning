@@ -12,6 +12,7 @@ def evaluate_models(models_param_grid, data_dict, dataset):
             model = model_class
             if poly(model):
                 result = classifier_evaluation_poly(model, param, data_dict, dataset)
+                results = pd.concat([results, model_results]).reset_index(drop=True)
 
             result = classifier_evaluation(model, param, data_dict, dataset)
             model_results = pd.concat([model_results, result]).reset_index(drop=True)
@@ -105,9 +106,10 @@ def classifier_evaluation_poly(model_class, param, data, dataset):
             "validation": data_poly.get("y_validation"),
             "test": data_poly.get("y_test"),
         }
+        params = dict(param, degree=i)
 
         metrics = get_metrics(metrics_mapping[dataset], yhat_model)
-        result = create_result(model, param, metrics)
-        create_result_mlflow(model, param, metrics, dataset, Polynomial=True)
+        result = create_result(model, params, metrics)
+        create_result_mlflow(model, params, metrics, dataset, Polynomial=True)
 
     return result
